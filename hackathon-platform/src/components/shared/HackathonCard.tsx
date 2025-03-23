@@ -1,8 +1,9 @@
 // components/shared/HackathonCard.tsx
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { CalendarDays, Users } from "lucide-react";
 
 type HackathonCardProps = {
-  id: number;
   name: string;
   creatorId: string;
   regDeadline: string;
@@ -22,56 +23,48 @@ export const HackathonCard = ({
   image
 }: HackathonCardProps) => {
   return (
-    <Card className="overflow-hidden h-full flex flex-col">
-      {/* Image Section - Top Half */}
-      <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-        {image ? (
-          <img 
-            src={image} 
-            alt={name}
-            className="object-cover w-full h-full"
-          />
-        ) : (
-          <div className="bg-gradient-to-r from-blue-100 to-purple-100 w-full h-full flex items-center justify-center">
-            <span className="text-gray-400 text-sm">Hackathon Logo</span>
-          </div>
-        )}
-      </div>
-
-      {/* Content Section - Bottom Half */}
-      <div className="p-4 flex-1">
-        <h3 className="font-medium text-lg mb-2">{name}</h3>
-        
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Creator ID:</span>
-            <span className="font-mono">{creatorId}</span>
-          </div>
-          
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Participants:</span>
-            <span>{participants.toLocaleString()}</span>
-          </div>
-          
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Reg. Deadline:</span>
-            <span>{new Date(regDeadline).toLocaleDateString()}</span>
-          </div>
-          
-          {isRegistered && subDeadline && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Sub. Deadline:</span>
-              <span>{new Date(subDeadline).toLocaleDateString()}</span>
-            </div>
-          )}
+    <Card className="overflow-hidden transition-shadow hover:shadow-md">
+      <div className="p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold truncate">{name}</h3>
+          <span 
+            className={cn(
+              "px-2 py-1 text-xs rounded-full",
+              isRegistered 
+                ? "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400"
+                : "bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-400"
+            )}
+          >
+            {isRegistered ? "Registered" : "Open"}
+          </span>
         </div>
 
-        <div className="mt-4 text-sm font-medium">
-          {isRegistered ? (
-            <span className="text-green-600">✓ Registered</span>
-          ) : (
-            <span className="text-red-600">✗ Registration Open</span>
-          )}
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Organizer:</span>
+            <span className="font-mono text-xs">{creatorId}</span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-muted-foreground" />
+            <span>{participants.toLocaleString()} participants</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <CalendarDays className="w-4 h-4 text-muted-foreground" />
+            <span>
+              Reg. by {new Date(regDeadline).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+              })}
+            </span>
+          </div>
+        </div>
+
+        <div className="pt-2 border-t">
+          <button className="w-full text-sm font-medium text-primary hover:underline">
+            {isRegistered ? "View details →" : "Learn more →"}
+          </button>
         </div>
       </div>
     </Card>

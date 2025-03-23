@@ -1,5 +1,5 @@
 // app/dashboard/[role]/page.tsx
-import { HackathonCard } from "@/components/shared/HackathonCard";
+import { StudentView } from "@/components/Dashboard/Student/StudentView";
 
 const mockHackathons = [
   {
@@ -10,7 +10,7 @@ const mockHackathons = [
     subDeadline: "2024-03-25",
     participants: 142,
     isRegistered: true,
-    image: "/placeholder-hackathon.jpg"
+    image: "<public/black.jpg"
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const mockHackathons = [
     subDeadline: "2024-03-28",
     participants: 89,
     isRegistered: false,
-    image: "/placeholder-hackathon.jpg"
+    image: "public/black.jpg"
   },
   {
     id: 3,
@@ -30,7 +30,7 @@ const mockHackathons = [
     subDeadline: "2024-03-30",
     participants: 204,
     isRegistered: true,
-    image: "/placeholder-hackathon.jpg"
+    image: "public/black.jpg"
   }
 ];
 
@@ -39,16 +39,10 @@ export default function DashboardPage({ params }: { params: { role: string } }) 
     <div>
       <h1 className="text-2xl font-bold mb-6">{params.role} Dashboard</h1>
       
-      {params.role === "student" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {mockHackathons.map((hackathon) => (
-            <HackathonCard
-              key={hackathon.id}
-              {...hackathon}
-            />
-          ))}
-        </div>
-      )}
+      {params.role === "student" && <StudentView hackathons={mockHackathons} />}
+      
+      {params.role === "teacher" && <div>Teacher Dashboard Content</div>}
+      {params.role === "admin" && <div>Admin Dashboard Content</div>}
     </div>
   );
 }
