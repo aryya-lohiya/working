@@ -16,16 +16,27 @@ const hackathons = [
 export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState("hackathons");
   const [activeFilter, setActiveFilter] = useState("all");
-  const [newHackathon, setNewHackathon] = useState({
+  const [newHackathon, setNewHackathon] = useState<{
+    name: string;
+    description: string;
+    judgingCriteria: string[];
+    criterionInput: string;
+    submissionDeadline: string;
+  }>({
     name: "",
     description: "",
-    judgingCriteria: [],
+    judgingCriteria: [], // ✅ Ensure it's initialized as an array
     criterionInput: "",
-    submissionDeadline: ""
+    submissionDeadline: "",
   });
+  
 
   const router = useRouter();
-  const statusOrder = { "Results to be Announced": 1, "Completed": 2 };
+  const statusOrder: Record<string, number> = {
+    "Results to be Announced": 1,
+    "Completed": 2,
+  };
+  
 
   const filteredHackathons = hackathons
     .filter(h => activeFilter === "all" || h.status === activeFilter)
@@ -51,7 +62,7 @@ export default function TeacherDashboard() {
       submissionDeadline: ""
     });
   };
-
+  
   return (
     <div className="min-h-screen bg-white text-black p-6">
       <h1 className="text-2xl font-bold mb-6">Teacher Dashboard</h1>
@@ -152,9 +163,12 @@ export default function TeacherDashboard() {
                   key={hackathon.id}
                   className="border rounded-lg p-6 shadow-md flex flex-col cursor-pointer"
                   onClick={() => {
-    if (hackathon.status === "Completed") {
-      router.push(`/dashboard/teacher/results/${hackathon.id}`);
-    }}}
+                    if (hackathon.status === "Completed") {
+                      router.push(`/dashboard/teacher/results/${hackathon.id}`);
+                    } else if (hackathon.status === "Results to be Announced") {
+                      router.push(`/dashboard/teacher/results/notCompleted/${hackathon.id}`);
+                    }
+                  }}
                 >
                   <div className="flex justify-between items-center">
                     <h2 className="font-semibold">{hackathon.name}</h2>
