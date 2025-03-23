@@ -10,7 +10,7 @@ interface HackathonSubTabsProps {
 export const HackathonSubTabs = ({ 
   activeTab, onTabChange }:
   HackathonSubTabsProps) => {
-  const subTabs = ["previous", "submitted", "registered", "available", "upcoming"];
+  const subTabs = ["previous", "submitted",  "available"];
 
   return (
     <div className="flex gap-2 pb-4 overflow-x-auto scrollbar-hide">

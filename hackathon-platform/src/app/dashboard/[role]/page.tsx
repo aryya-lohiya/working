@@ -1,4 +1,6 @@
-// app/dashboard/[role]/page.tsx
+"use client"; 
+
+import { useParams } from "next/navigation";
 import { StudentView } from "@/components/Dashboard/Student/StudentView";
 import TeacherDashboard from "@/components/Dashboard/TeacherView";
 
@@ -11,7 +13,7 @@ const mockHackathons = [
     subDeadline: "2024-03-25",
     participants: 142,
     isRegistered: true,
-    image: "<public/black.jpg"
+    image: "public/black.jpg"
   },
   {
     id: 2,
@@ -35,14 +37,15 @@ const mockHackathons = [
   }
 ];
 
-export default function DashboardPage({ params }: { params: { role: string } }) {
+export default function DashboardPage() {
+  const params = useParams(); 
+
+  if (!params?.role) return <div>Loading...</div>; 
+
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">{params.role} Dashboard</h1>
-      
       {params.role === "student" && <StudentView hackathons={mockHackathons} />}
-      
-      {params.role === "teacher" && <div><TeacherDashboard/></div>}
+      {params.role === "teacher" && <TeacherDashboard />}
       {params.role === "admin" && <div>Admin Dashboard Content</div>}
     </div>
   );
