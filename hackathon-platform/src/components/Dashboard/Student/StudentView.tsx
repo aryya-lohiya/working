@@ -1,9 +1,6 @@
 // components/Dashboard/Student/StudentView.tsx
 "use client";
-import { useState } from "react";
-import { RoleTabs } from "./RoleTabs";
 import { HackathonsTab } from "./HackathonsTab/HackathonsTab";
-import { TeachersTab } from "./TeachersTab/TeachersTab";
 
 interface StudentViewProps {
   hackathons: Array<{
@@ -19,14 +16,9 @@ interface StudentViewProps {
 }
 
 export const StudentView = ({ hackathons }: StudentViewProps) => {
-  const [activeTab, setActiveTab] = useState<"hackathons" | "teachers">("hackathons");
-
   return (
-    <div className="space-y-6">
-      <RoleTabs activeTab={activeTab} onTabChange={setActiveTab} />
-      
-      {activeTab === "hackathons" && <HackathonsTab hackathons={hackathons} />}
-      {activeTab === "teachers" && <TeachersTab />}
+    <div className="w-full space-y-6">
+      <HackathonsTab hackathons={hackathons} />
     </div>
   );
 };
