@@ -1,9 +1,9 @@
-// components/shared/HackathonCard.tsx
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { CalendarDays, Users } from "lucide-react";
 
 type HackathonCardProps = {
+  id: number;
   name: string;
   creatorId: string;
   regDeadline: string;
@@ -11,19 +11,25 @@ type HackathonCardProps = {
   participants: number;
   isRegistered: boolean;
   image?: string;
+  onClick?: () => void; // Accept onClick prop
 };
 
 export const HackathonCard = ({
+  id,
   name,
   creatorId,
   regDeadline,
   subDeadline,
   participants,
   isRegistered,
-  image
+  image,
+  onClick, // Receive onClick prop
 }: HackathonCardProps) => {
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-md">
+    <Card
+      onClick={onClick} // Apply onClick to make the card clickable
+      className="overflow-hidden transition-shadow hover:shadow-md cursor-pointer"
+    >
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold truncate">{name}</h3>

@@ -1,5 +1,6 @@
 // app/dashboard/[role]/page.tsx
 import { StudentView } from "@/components/Dashboard/Student/StudentView";
+import TeacherDashboard from "@/components/Dashboard/TeacherView";
 
 const mockHackathons = [
   {
@@ -41,7 +42,7 @@ export default function DashboardPage({ params }: { params: { role: string } }) 
       
       {params.role === "student" && <StudentView hackathons={mockHackathons} />}
       
-      {params.role === "teacher" && <div>Teacher Dashboard Content</div>}
+      {params.role === "teacher" && <div><TeacherDashboard/></div>}
       {params.role === "admin" && <div>Admin Dashboard Content</div>}
     </div>
   );
