@@ -4,7 +4,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea2";
 import { useRouter } from "next/navigation";
-import { useToast } from "../ui/use-toast";
+import { Toaster, toast } from "sonner"; // 
 
 const hackathons = [
   { id: 1, name: "AI Innovation Challenge", creatorId: "t_001", participants: 142, status: "Results to be Announced", subDeadline: "Mar 15" },
@@ -15,7 +15,6 @@ const hackathons = [
 ];
 
 export default function TeacherDashboard() {
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("hackathons");
   const [activeFilter, setActiveFilter] = useState("all");
   const [newHackathon, setNewHackathon] = useState<{
@@ -40,27 +39,15 @@ export default function TeacherDashboard() {
 
   const filteredHackathons = hackathons
     .filter(h => activeFilter === "all" || h.status === activeFilter)
-    .sort((a, b) => {
-      if (statusOrder[a.status] !== statusOrder[b.status]) {
-        return statusOrder[a.status] - statusOrder[b.status];
-      }
-      return a.name.localeCompare(b.name);
-    });
+    .sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name));
 
   const handleCreateHackathon = () => {
     if (!newHackathon.name || !newHackathon.submissionDeadline) {
-      toast({
-        title: "Required fields missing",
-        description: "Problem statement and submission deadline are required!",
-        variant: "destructive",
-      });
+      toast.error("Problem statement and submission deadline are required!");
       return;
     }
     console.log("Creating Hackathon:", newHackathon);
-    toast({
-      title: "Hackathon Created",
-      description: "Hackathon created successfully!",
-    });
+    toast.success("Hackathon created successfully!");
     setNewHackathon({
       name: "",
       description: "",
@@ -72,6 +59,7 @@ export default function TeacherDashboard() {
 
   return (
     <div className="min-h-screen bg-white text-black p-6">
+      <Toaster /> {/* ✅ Ensure toast notifications work */}
       <h1 className="text-2xl font-bold mb-6">Teacher Dashboard</h1>
 
       <div className="flex border-b">
@@ -110,15 +98,13 @@ export default function TeacherDashboard() {
                     <button
                       onClick={() => {
                         if (newHackathon.judgingCriteria.length <= 1) {
-                          toast({
-                            title: "Cannot remove",
-                            description: "You must have at least one judging criterion.",
-                            variant: "destructive",
-                          });
+                          toast.error("You must have at least one judging criterion.");
                           return;
                         }
-                        const updatedCriteria = newHackathon.judgingCriteria.filter((_, i) => i !== index);
-                        setNewHackathon({ ...newHackathon, judgingCriteria: updatedCriteria });
+                        setNewHackathon({
+                          ...newHackathon,
+                          judgingCriteria: newHackathon.judgingCriteria.filter((_, i) => i !== index),
+                        });
                       }}
                       className="ml-2 hover:text-red-600"
                     >
@@ -137,11 +123,7 @@ export default function TeacherDashboard() {
                     e.preventDefault();
                     if (!newHackathon.criterionInput.trim()) return;
                     if (newHackathon.judgingCriteria.length >= 10) {
-                      toast({
-                        title: "Maximum criteria reached",
-                        description: "You can have a maximum of 10 judging criteria.",
-                        variant: "destructive",
-                      });
+                      toast.error("You can have a maximum of 10 judging criteria.");
                       return;
                     }
                     setNewHackathon({
@@ -162,7 +144,6 @@ export default function TeacherDashboard() {
               <h3 className="text-sm font-semibold mb-2">Submission Deadline</h3>
               <Input
                 type="date"
-                placeholder="YYYY-MM-DD"
                 value={newHackathon.submissionDeadline}
                 onChange={(e) => setNewHackathon({ ...newHackathon, submissionDeadline: e.target.value })}
                 className="w-full"
@@ -190,31 +171,31 @@ export default function TeacherDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredHackathons.map(hackathon => (
                 <div
-                  key={hackathon.id}
-                  className="border rounded-lg p-6 shadow-md flex flex-col cursor-pointer"
-                  onClick={() => {
-                    if (hackathon.status === "Completed") {
-                      router.push(`/dashboard/teacher/results/${hackathon.id}`);
-                    } else if (hackathon.status === "Results to be Announced") {
-                      router.push(`/dashboard/teacher/results/notCompleted/${hackathon.id}`);
-                    }
-                  }}
-                >
-                  <div className="flex justify-between items-center">
-                    <h2 className="font-semibold">{hackathon.name}</h2>
-                    <p className={`text-sm font-semibold ${hackathon.status === "Results to be Announced" ? "text-green-600" : "text-blue-600"}`}>
-                      {hackathon.status}
-                    </p>
-                  </div>
-
-                  <p className="text-sm text-gray-600 mt-1">Organizer: <span className="font-mono">{hackathon.creatorId}</span></p>
-                  <p className="text-sm text-gray-600 mt-1">👥 {hackathon.participants} participants</p>
-                  <p className="text-sm text-gray-600 mt-1">📅 Submission Deadline: <span className="font-semibold">{hackathon.subDeadline}</span></p>
-
-                  <div className="mt-3 border-t pt-3 text-center font-semibold text-blue-500">
-                    View details →
-                  </div>
+                key={hackathon.id}
+                className="border rounded-lg p-6 shadow-md flex flex-col cursor-pointer"
+                onClick={() => {
+                  if (hackathon.status === "Completed") {
+                    router.push(`/dashboard/teacher/results/${hackathon.id}`);
+                  } else if (hackathon.status === "Results to be Announced") {
+                    router.push(`/dashboard/teacher/results/notCompleted/${hackathon.id}`);
+                  }
+                }}
+              >
+                <div className="flex justify-between items-center">
+                  <h2 className="font-semibold">{hackathon.name}</h2>
+                  <p className={`text-sm font-semibold ${hackathon.status === "Results to be Announced" ? "text-green-600" : "text-blue-600"}`}>
+                    {hackathon.status}
+                  </p>
                 </div>
+
+                <p className="text-sm text-gray-600 mt-1">Organizer: <span className="font-mono">{hackathon.creatorId}</span></p>
+                <p className="text-sm text-gray-600 mt-1">👥 {hackathon.participants} participants</p>
+                <p className="text-sm text-gray-600 mt-1">📅 Submission Deadline: <span className="font-semibold">{hackathon.subDeadline}</span></p>
+
+                <div className="mt-3 border-t pt-3 text-center font-semibold text-blue-500">
+                  View details →
+                </div>
+              </div>
               ))}
             </div>
           </div>
