@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useTheme } from "theme"
+// import { useTheme } from "theme"
 import { Toaster as Sonner, toast } from "sonner"
 
 type ToastProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToastProps) => {
-  const { resolvedTheme } = useTheme()
+  // const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const Toaster = ({ ...props }: ToastProps) => {
 
   return (
     <Sonner
-      theme={resolvedTheme as ToastProps["theme"]}
+      // theme={resolvedTheme as ToastProps["theme"]}
       className="toaster group"
       toastOptions={{
         classNames: {

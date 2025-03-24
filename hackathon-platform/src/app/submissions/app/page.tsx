@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Toaster as sonner, Toaster } from "@/components/ui/sonner"
+import { useToast } from "@/hooks/use-toast"
 
 export default function HackathonEvaluationPage() {
   const { toast } = useToast()
@@ -182,4 +182,3 @@ export default function HackathonEvaluationPage() {
     </div>
   )
 }
-
