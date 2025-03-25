@@ -1,151 +1,182 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation"; 
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 
+// Define types for our data
 type Parameter = {
-  name: string;
-  score: number;
-};
+  name: string
+  score: number
+}
 
 type Student = {
-  id: number;
-  name: string;
-  parameters: Parameter[];
-  aggregate: number;
-  submission: {
-    type: "text" | "audio" | "video" | "pdf";
-    content: string;
-    description: string;
-  };
-};
+  id: number
+  name: string
+  parameters: Parameter[]
+  aggregate: number
+}
 
-// Mock Data
-const mockHackathonData = {
-  "1": [
+export default function HackathonResults() {
+  // Sample hackathon name - can be changed
+  const [hackathonName, setHackathonName] = useState("Web Development Hackathon 2025")
+
+  // Sample parameters - can be modified
+  const [parameterNames, setParameterNames] = useState([
+    "UI/UX Design",
+    "Code Quality",
+    "Innovation",
+    "Functionality",
+    "Presentation",
+  ])
+
+  // Sample student data
+  const [students, setStudents] = useState<Student[]>([
+    {
+      id: 1,
+      name: "Alex Johnson",
+      parameters: [
+        { name: "UI/UX Design", score: 8.5 },
+        { name: "Code Quality", score: 7.8 },
+        { name: "Innovation", score: 9.2 },
+        { name: "Functionality", score: 8.0 },
+        { name: "Presentation", score: 7.5 },
+      ],
+      aggregate: 0, // Will be calculated
+    },
     {
       id: 2,
-      name: "Alice Johnson",
+      name: "Sam Wilson",
       parameters: [
-        { name: "Innovation", score: 8.5 },
-        { name: "Feasibility", score: 7.0 },
-        { name: "Presentation", score: 9.0 },
+        { name: "UI/UX Design", score: 6.5 },
+        { name: "Code Quality", score: 8.2 },
+        { name: "Innovation", score: 5.5 },
+        { name: "Functionality", score: 7.8 },
+        { name: "Presentation", score: 6.0 },
       ],
-      aggregate: 8.17,
-      submission: {
-        type: "text",
-        content: "Our project focuses on AI-driven healthcare solutions...",
-        description: "AI-based diagnosis assistance system.",
-      },
+      aggregate: 0,
     },
     {
       id: 3,
-      name: "Bob Smith",
+      name: "Taylor Smith",
       parameters: [
-        { name: "Innovation", score: 6.5 },
-        { name: "Feasibility", score: 8.0 },
-        { name: "Presentation", score: 7.5 },
-      ],
-      aggregate: 7.33,
-      submission: {
-        type: "text",
-        content: "We developed a blockchain-based voting system...",
-        description: "Decentralized and transparent voting system.",
-      },
-    },
-  ],
-  "2": [
-    {
-      id: 5,
-      name: "Eve Adams",
-      parameters: [
-        { name: "Innovation", score: 7.5 },
-        { name: "Feasibility", score: 9.0 },
+        { name: "UI/UX Design", score: 9.0 },
+        { name: "Code Quality", score: 8.5 },
+        { name: "Innovation", score: 8.8 },
+        { name: "Functionality", score: 9.2 },
         { name: "Presentation", score: 8.5 },
       ],
-      aggregate: 8.33,
-      submission: {
-        type: "text",
-        content: "A self-sustaining energy project using solar and wind...",
-        description: "Renewable energy for smart cities.",
-      },
+      aggregate: 0,
     },
-  ],
-};
+    {
+      id: 4,
+      name: "Jordan Lee",
+      parameters: [
+        { name: "UI/UX Design", score: 3.2 },
+        { name: "Code Quality", score: 5.5 },
+        { name: "Innovation", score: 7.0 },
+        { name: "Functionality", score: 4.8 },
+        { name: "Presentation", score: 6.5 },
+      ],
+      aggregate: 0,
+    },
+    {
+      id: 5,
+      name: "Casey Brown",
+      parameters: [
+        { name: "UI/UX Design", score: 7.8 },
+        { name: "Code Quality", score: 2.5 },
+        { name: "Innovation", score: 6.0 },
+        { name: "Functionality", score: 5.5 },
+        { name: "Presentation", score: 8.0 },
+      ],
+      aggregate: 0,
+    },
+  ])
 
-export default function HackathonResults() {
-  const router = useRouter();
-  // const { hackathonId } = useParams();
-  const { role, hackathonId } = useParams();
-  const [students, setStudents] = useState<Student[]>([]);
-  const [hackathonName, setHackathonName] = useState(`Hackathon ${hackathonId}`);
-  const [loading, setLoading] = useState(true);
-  
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState("")
 
-  useEffect(() => {
-    if (!hackathonId) return;
+  // Calculate aggregate scores and sort students
+  const sortedStudents = [...students]
+    .map((student) => {
+      // Calculate aggregate
+      const sum = student.parameters.reduce((acc, param) => acc + param.score, 0)
+      const aggregate = Number.parseFloat((sum / student.parameters.length).toFixed(2))
+      return { ...student, aggregate }
+    })
+    .sort((a, b) => b.aggregate - a.aggregate)
+    .filter(student => 
+      student.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
 
-    let storedHackathons = localStorage.getItem("hackathonData");
-    if (!storedHackathons) {
-      localStorage.setItem("hackathonData", JSON.stringify(mockHackathonData));
-      storedHackathons = JSON.stringify(mockHackathonData);
-    }
-
-    const hackathonData = JSON.parse(storedHackathons);
-    const hackathonStudents = hackathonData[String(hackathonId)] || [];
-
-
-    setStudents(hackathonStudents);
-    setLoading(false);
-  }, [hackathonId]);
-
-  if (loading) {
-    return <div className="container mx-auto py-8 px-4 text-center">Loading...</div>;
+  // Function to determine cell background color based on score
+  const getScoreColor = (score: number) => {
+    if (score >= 7) return "bg-green-100 dark:bg-green-900/30"
+    if (score >= 4) return "bg-yellow-100 dark:bg-yellow-900/30"
+    return "bg-red-100 dark:bg-red-900/30"
   }
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <Button variant="outline" className="mb-4" onClick={() => router.push("/dashboard/teacher")}>
-        ← Back to Results
-      </Button>
-
       <Card className="w-full">
-        <CardHeader>
-          <CardTitle>{hackathonName} - Student Submissions</CardTitle>
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold">{hackathonName}</CardTitle>
+          <p className="text-xl text-muted-foreground">Results</p>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student Name</TableHead>
-                <TableHead>Submission</TableHead>
-                <TableHead>Aggregate Score</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {students.length > 0 ? (
-                students.map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.submission.description}</TableCell>
-                    <TableCell className="font-bold">{student.aggregate}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
+          {/* Added search bar */}
+          <div className="mb-4">
+            <Input
+              type="text"
+              placeholder="Search students by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full max-w-md mx-auto"
+            />
+          </div>
+          
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center">
-                    No students found for this hackathon.
-                  </TableCell>
+                  <TableHead className="w-16">S.No</TableHead>
+                  <TableHead>Name</TableHead>
+                  {parameterNames.map((param, index) => (
+                    <TableHead key={index}>{param} (10)</TableHead>
+                  ))}
+                  <TableHead>Aggregate</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {sortedStudents.length > 0 ? (
+                  sortedStudents.map((student, index) => (
+                    <TableRow key={student.id}>
+                      <TableCell className="font-medium">{index + 1}</TableCell>
+                      <TableCell>{student.name}</TableCell>
+                      {student.parameters.map((param, paramIndex) => (
+                        <TableCell key={paramIndex} className={`${getScoreColor(param.score)} font-medium text-center`}>
+                          {param.score.toFixed(1)}
+                        </TableCell>
+                      ))}
+                      <TableCell className="font-bold text-center">{student.aggregate.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={parameterNames.length + 3} className="text-center">
+                      {students.length === 0 
+                        ? "No students found" 
+                        : "No students match your search"}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
