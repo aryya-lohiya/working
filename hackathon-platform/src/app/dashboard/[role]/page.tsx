@@ -47,7 +47,7 @@ export default function DashboardPage() {
     <div>
       {params.role === "student" && <StudentView hackathons={mockHackathons} />}
       {params.role === "teacher" && <TeacherDashboard />}
-      {params.role === "admin" && <div>Admin Dashboard Content</div>}
+      {params.role === "admin" && <AdminDashboard />}
     </div>
   );
 }
