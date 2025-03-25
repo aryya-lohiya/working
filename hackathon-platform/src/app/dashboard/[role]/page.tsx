@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { StudentView } from "@/components/Dashboard/Student/StudentView";
 import TeacherDashboard from "@/components/Dashboard/TeacherView";
+import AdminDashboard from "@/components/Dashboard/AdminView";
 
 const mockHackathons = [
   {
