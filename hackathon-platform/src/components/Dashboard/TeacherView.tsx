@@ -15,6 +15,7 @@ const hackathons = [
 ];
 
 export default function TeacherDashboard() {
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("hackathons");
   const [activeFilter, setActiveFilter] = useState("all");
   const [newHackathon, setNewHackathon] = useState<{
@@ -39,6 +40,7 @@ export default function TeacherDashboard() {
 
   const filteredHackathons = hackathons
     .filter(h => activeFilter === "all" || h.status === activeFilter)
+    .filter(h => h.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name));
 
   const handleCreateHackathon = () => {
@@ -56,7 +58,8 @@ export default function TeacherDashboard() {
       submissionDeadline: ""
     });
   };
-
+  
+    
   return (
     <div className="min-h-screen bg-white text-black p-6">
       <Toaster /> {/* ✅ Ensure toast notifications work */}
@@ -156,6 +159,7 @@ export default function TeacherDashboard() {
           </div>
 
           <div className="col-span-3">
+            
             <div className="flex border-b mb-4">
               {["Results to be Announced", "Completed", "all"].map(filter => (
                 <button
@@ -168,34 +172,45 @@ export default function TeacherDashboard() {
               ))}
             </div>
 
+            {/* Added search bar here */}
+            <div className="mb-6">
+              <Input
+                type="text"
+                placeholder="Search hackathons by name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full"
+              />
+            </div>
+              
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredHackathons.map(hackathon => (
                 <div
-                key={hackathon.id}
-                className="border rounded-lg p-6 shadow-md flex flex-col cursor-pointer"
-                onClick={() => {
-                  if (hackathon.status === "Completed") {
-                    router.push(`/dashboard/teacher/results/${hackathon.id}`);
-                  } else if (hackathon.status === "Results to be Announced") {
-                    router.push(`/dashboard/teacher/results/notCompleted/${hackathon.id}`);
-                  }
-                }}
-              >
-                <div className="flex justify-between items-center">
-                  <h2 className="font-semibold">{hackathon.name}</h2>
-                  <p className={`text-sm font-semibold ${hackathon.status === "Results to be Announced" ? "text-green-600" : "text-blue-600"}`}>
-                    {hackathon.status}
-                  </p>
-                </div>
+                  key={hackathon.id}
+                  className="border rounded-lg p-6 shadow-md flex flex-col cursor-pointer"
+                  onClick={() => {
+                    if (hackathon.status === "Completed") {
+                      router.push(`/dashboard/teacher/results/${hackathon.id}`);
+                    } else if (hackathon.status === "Results to be Announced") {
+                      router.push(`/dashboard/teacher/results/notCompleted/${hackathon.id}`);
+                    }
+                  }}
+                >
+                  <div className="flex justify-between items-center">
+                    <h2 className="font-semibold">{hackathon.name}</h2>
+                    <p className={`text-sm font-semibold ${hackathon.status === "Results to be Announced" ? "text-green-600" : "text-blue-600"}`}>
+                      {hackathon.status}
+                    </p>
+                  </div>
 
-                <p className="text-sm text-gray-600 mt-1">Organizer: <span className="font-mono">{hackathon.creatorId}</span></p>
-                <p className="text-sm text-gray-600 mt-1">👥 {hackathon.participants} participants</p>
-                <p className="text-sm text-gray-600 mt-1">📅 Submission Deadline: <span className="font-semibold">{hackathon.subDeadline}</span></p>
+                  <p className="text-sm text-gray-600 mt-1">Organizer: <span className="font-mono">{hackathon.creatorId}</span></p>
+                  <p className="text-sm text-gray-600 mt-1">👥 {hackathon.participants} participants</p>
+                  <p className="text-sm text-gray-600 mt-1">📅 Submission Deadline: <span className="font-semibold">{hackathon.subDeadline}</span></p>
 
-                <div className="mt-3 border-t pt-3 text-center font-semibold text-blue-500">
-                  View details →
+                  <div className="mt-3 border-t pt-3 text-center font-semibold text-blue-500">
+                    View details →
+                  </div>
                 </div>
-              </div>
               ))}
             </div>
           </div>

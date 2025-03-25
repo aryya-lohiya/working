@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 
 // Define types for our data
 type Parameter = {
@@ -94,6 +95,9 @@ export default function HackathonResults() {
     },
   ])
 
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState("")
+
   // Calculate aggregate scores and sort students
   const sortedStudents = [...students]
     .map((student) => {
@@ -103,6 +107,9 @@ export default function HackathonResults() {
       return { ...student, aggregate }
     })
     .sort((a, b) => b.aggregate - a.aggregate)
+    .filter(student => 
+      student.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
 
   // Function to determine cell background color based on score
   const getScoreColor = (score: number) => {
@@ -119,6 +126,17 @@ export default function HackathonResults() {
           <p className="text-xl text-muted-foreground">Results</p>
         </CardHeader>
         <CardContent>
+          {/* Added search bar */}
+          <div className="mb-4">
+            <Input
+              type="text"
+              placeholder="Search students by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full max-w-md mx-auto"
+            />
+          </div>
+          
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -132,18 +150,28 @@ export default function HackathonResults() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedStudents.map((student, index) => (
-                  <TableRow key={student.id}>
-                    <TableCell className="font-medium">{index + 1}</TableCell>
-                    <TableCell>{student.name}</TableCell>
-                    {student.parameters.map((param, paramIndex) => (
-                      <TableCell key={paramIndex} className={`${getScoreColor(param.score)} font-medium text-center`}>
-                        {param.score.toFixed(1)}
-                      </TableCell>
-                    ))}
-                    <TableCell className="font-bold text-center">{student.aggregate.toFixed(2)}</TableCell>
+                {sortedStudents.length > 0 ? (
+                  sortedStudents.map((student, index) => (
+                    <TableRow key={student.id}>
+                      <TableCell className="font-medium">{index + 1}</TableCell>
+                      <TableCell>{student.name}</TableCell>
+                      {student.parameters.map((param, paramIndex) => (
+                        <TableCell key={paramIndex} className={`${getScoreColor(param.score)} font-medium text-center`}>
+                          {param.score.toFixed(1)}
+                        </TableCell>
+                      ))}
+                      <TableCell className="font-bold text-center">{student.aggregate.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={parameterNames.length + 3} className="text-center">
+                      {students.length === 0 
+                        ? "No students found" 
+                        : "No students match your search"}
+                    </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>
@@ -152,4 +180,3 @@ export default function HackathonResults() {
     </div>
   )
 }
-
