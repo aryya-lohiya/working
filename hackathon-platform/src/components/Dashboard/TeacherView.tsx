@@ -176,7 +176,7 @@ export default function TeacherDashboard() {
             <div className="mb-6">
               <Input
                 type="text"
-                placeholder="Search hackathons by name..."
+                placeholder="🔎 Search hackathons by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full"

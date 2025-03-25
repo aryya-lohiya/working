@@ -1,27 +1,35 @@
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card"
-import { Input } from "./components/ui/input"
-import { Trophy } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+"use client";
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Trophy } from "lucide-react";
+// import { useNavigate } from "react-router-dom"
+import Link from "next/link";
 
 // Define types for our data
 type Parameter = {
-  name: string
-  score: number
-}
+  name: string;
+  score: number;
+};
 
 type Student = {
-  id: number
-  name: string
-  parameters: Parameter[]
-  aggregate: number
-}
+  id: number;
+  name: string;
+  parameters: Parameter[];
+  aggregate: number;
+};
 
 export default function App() {
-  const navigate = useNavigate()
   // Sample hackathon name - can be changed
-  const [hackathonName] = useState("Web Development Hackathon 2025")
+  const [hackathonName] = useState("Web Development Hackathon 2025");
 
   // Sample parameters - can be modified
   const [parameterNames] = useState([
@@ -30,7 +38,10 @@ export default function App() {
     "Innovation",
     "Functionality",
     "Presentation",
-  ])
+  ]);
+  const handleRowClick = (studentId: number) => {
+    console.log("Clicked student ID:", studentId);
+  };
 
   // Sample student data
   const [students] = useState<Student[]>([
@@ -94,42 +105,43 @@ export default function App() {
       ],
       aggregate: 0,
     },
-  ])
+  ]);
 
   // Search functionality
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Calculate aggregate scores and sort students
   const sortedStudents = [...students]
     .map((student) => {
       // Calculate aggregate
-      const sum = student.parameters.reduce((acc, param) => acc + param.score, 0)
-      const aggregate = Number.parseFloat((sum / student.parameters.length).toFixed(2))
-      return { ...student, aggregate }
+      const sum = student.parameters.reduce(
+        (acc, param) => acc + param.score,
+        0
+      );
+      const aggregate = Number.parseFloat(
+        (sum / student.parameters.length).toFixed(2)
+      );
+      return { ...student, aggregate };
     })
     .sort((a, b) => b.aggregate - a.aggregate)
-    .filter(student => 
+    .filter((student) =>
       student.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    );
 
   // Function to determine cell background color based on score
   const getScoreColor = (score: number) => {
-    if (score >= 7) return "bg-green-100 dark:bg-green-900/30"
-    if (score >= 4) return "bg-yellow-100 dark:bg-yellow-900/30"
-    return "bg-red-100 dark:bg-red-900/30"
-  }
+    if (score >= 7) return "bg-green-100 dark:bg-green-900/30";
+    if (score >= 4) return "bg-yellow-100 dark:bg-yellow-900/30";
+    return "bg-red-100 dark:bg-red-900/30";
+  };
 
   // Function to get rank badge
   const getRankBadge = (index: number) => {
-    if (index === 0) return "🥇"
-    if (index === 1) return "🥈"
-    if (index === 2) return "🥉"
-    return ""
-  }
-
-  const handleRowClick = (id: number) => {
-    navigate(`/submission/${id}`)
-  }
+    if (index === 0) return "🥇";
+    if (index === 1) return "🥈";
+    if (index === 2) return "🥉";
+    return "";
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -137,22 +149,27 @@ export default function App() {
         <CardHeader className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
             <Trophy className="h-8 w-8 text-yellow-500" />
-            <CardTitle className="text-3xl font-bold">{hackathonName}</CardTitle>
+            <CardTitle className="text-3xl font-bold">
+              {hackathonName}
+            </CardTitle>
           </div>
           <p className="text-xl text-muted-foreground">Results</p>
         </CardHeader>
         <CardContent>
+        <p className="text-center text-sm text-gray-600 mb-4">
+    Click on a student's name to view their submission details.
+  </p>
           {/* Search bar */}
           <div className="mb-6">
             <Input
               type="text"
-              placeholder="Search students by name..."
+              placeholder="🔎Search students by name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full max-w-md mx-auto"
             />
           </div>
-          
+
           <div className="overflow-x-auto rounded-lg border">
             <Table>
               <TableHeader>
@@ -160,7 +177,9 @@ export default function App() {
                   <TableHead className="w-16">Rank</TableHead>
                   <TableHead>Name</TableHead>
                   {parameterNames.map((param, index) => (
-                    <TableHead key={index} className="text-center">{param} (10)</TableHead>
+                    <TableHead key={index} className="text-center">
+                      {param} (10)
+                    </TableHead>
                   ))}
                   <TableHead className="text-center">Aggregate</TableHead>
                 </TableRow>
@@ -168,19 +187,29 @@ export default function App() {
               <TableBody>
                 {sortedStudents.length > 0 ? (
                   sortedStudents.map((student, index) => (
-                    <TableRow 
-                      key={student.id} 
+                    <TableRow
+                      key={student.id}
                       className="hover:bg-muted/30 cursor-pointer"
                       onClick={() => handleRowClick(student.id)}
                     >
                       <TableCell className="font-medium">
                         {index + 1} {getRankBadge(index)}
                       </TableCell>
-                      <TableCell className="font-medium">{student.name}</TableCell>
+                      <TableCell className="text-center">
+                        <Link
+                          href={`/submissions/app`}
+                          className="text-black font-medium inline-block w-full"
+                        >
+                          {student.name}
+                        </Link>
+                      </TableCell>
+
                       {student.parameters.map((param, paramIndex) => (
-                        <TableCell 
-                          key={paramIndex} 
-                          className={`${getScoreColor(param.score)} font-medium text-center transition-colors`}
+                        <TableCell
+                          key={paramIndex}
+                          className={`${getScoreColor(
+                            param.score
+                          )} font-medium text-center transition-colors`}
                         >
                           {param.score.toFixed(1)}
                         </TableCell>
@@ -192,9 +221,12 @@ export default function App() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={parameterNames.length + 3} className="text-center h-24">
-                      {students.length === 0 
-                        ? "No students found" 
+                    <TableCell
+                      colSpan={parameterNames.length + 3}
+                      className="text-center h-24"
+                    >
+                      {students.length === 0
+                        ? "No students found"
                         : "No students match your search"}
                     </TableCell>
                   </TableRow>
@@ -205,5 +237,5 @@ export default function App() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
