@@ -1,9 +1,9 @@
-"use client"
-
 import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/ui/table"
+import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card"
+import { Input } from "./components/ui/input"
+import { Trophy } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 // Define types for our data
 type Parameter = {
@@ -18,12 +18,13 @@ type Student = {
   aggregate: number
 }
 
-export default function HackathonResults() {
+export default function App() {
+  const navigate = useNavigate()
   // Sample hackathon name - can be changed
-  const [hackathonName, setHackathonName] = useState("Web Development Hackathon 2025")
+  const [hackathonName] = useState("Web Development Hackathon 2025")
 
   // Sample parameters - can be modified
-  const [parameterNames, setParameterNames] = useState([
+  const [parameterNames] = useState([
     "UI/UX Design",
     "Code Quality",
     "Innovation",
@@ -32,7 +33,7 @@ export default function HackathonResults() {
   ])
 
   // Sample student data
-  const [students, setStudents] = useState<Student[]>([
+  const [students] = useState<Student[]>([
     {
       id: 1,
       name: "Alex Johnson",
@@ -118,16 +119,31 @@ export default function HackathonResults() {
     return "bg-red-100 dark:bg-red-900/30"
   }
 
+  // Function to get rank badge
+  const getRankBadge = (index: number) => {
+    if (index === 0) return "🥇"
+    if (index === 1) return "🥈"
+    if (index === 2) return "🥉"
+    return ""
+  }
+
+  const handleRowClick = (id: number) => {
+    navigate(`/submission/${id}`)
+  }
+
   return (
     <div className="container mx-auto py-8 px-4">
       <Card className="w-full">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">{hackathonName}</CardTitle>
+        <CardHeader className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <Trophy className="h-8 w-8 text-yellow-500" />
+            <CardTitle className="text-3xl font-bold">{hackathonName}</CardTitle>
+          </div>
           <p className="text-xl text-muted-foreground">Results</p>
         </CardHeader>
         <CardContent>
-          {/* Added search bar */}
-          <div className="mb-4">
+          {/* Search bar */}
+          <div className="mb-6">
             <Input
               type="text"
               placeholder="Search students by name..."
@@ -137,35 +153,46 @@ export default function HackathonResults() {
             />
           </div>
           
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-16">S.No</TableHead>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-16">Rank</TableHead>
                   <TableHead>Name</TableHead>
                   {parameterNames.map((param, index) => (
-                    <TableHead key={index}>{param} (10)</TableHead>
+                    <TableHead key={index} className="text-center">{param} (10)</TableHead>
                   ))}
-                  <TableHead>Aggregate</TableHead>
+                  <TableHead className="text-center">Aggregate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedStudents.length > 0 ? (
                   sortedStudents.map((student, index) => (
-                    <TableRow key={student.id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell>{student.name}</TableCell>
+                    <TableRow 
+                      key={student.id} 
+                      className="hover:bg-muted/30 cursor-pointer"
+                      onClick={() => handleRowClick(student.id)}
+                    >
+                      <TableCell className="font-medium">
+                        {index + 1} {getRankBadge(index)}
+                      </TableCell>
+                      <TableCell className="font-medium">{student.name}</TableCell>
                       {student.parameters.map((param, paramIndex) => (
-                        <TableCell key={paramIndex} className={`${getScoreColor(param.score)} font-medium text-center`}>
+                        <TableCell 
+                          key={paramIndex} 
+                          className={`${getScoreColor(param.score)} font-medium text-center transition-colors`}
+                        >
                           {param.score.toFixed(1)}
                         </TableCell>
                       ))}
-                      <TableCell className="font-bold text-center">{student.aggregate.toFixed(2)}</TableCell>
+                      <TableCell className="font-bold text-center text-primary">
+                        {student.aggregate.toFixed(2)}
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={parameterNames.length + 3} className="text-center">
+                    <TableCell colSpan={parameterNames.length + 3} className="text-center h-24">
                       {students.length === 0 
                         ? "No students found" 
                         : "No students match your search"}
